@@ -1,0 +1,192 @@
+
+<!DOCTYPE html>
+<html lang="" class="loading">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>技术改变世界，文化改变人心 - 一个专注于web安全的web狗</title>
+
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="google" content="notranslate" />
+    <meta name="keywords" content="Fechin,"> 
+    
+    <meta name="author" content="flight"> 
+    <link rel="alternative" href="atom.xml" title="技术改变世界，文化改变人心" type="application/atom+xml"> 
+    <link rel="icon" href="/img/favicon.png"> 
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+    <link rel="stylesheet" href="/css/diaspora.css">
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({
+        google_ad_client: "ca-pub-8691406134231910",
+        enable_page_level_ads: true
+      });
+    </script>
+
+</head>
+
+<body class="loading">
+    <div id="loader"></div>
+    <div id="single">
+    <div id="top" style="display: block;">
+    <div class="bar" style="width: 0;"></div>
+    <a class="icon-home image-icon" href="javascript:;"></a>
+    <div title="播放/暂停" class="icon-play"></div>
+    <h3 class="subtitle">TP框架学习笔记(路由)</h3>
+    <div class="social">
+        <!--<div class="like-icon">-->
+            <!--<a href="javascript:;" class="likeThis active"><span class="icon-like"></span><span class="count">76</span></a>-->
+        <!--</div>-->
+        <div>
+            <div class="share">
+                <a title="获取二维码" class="icon-scan" href="javascript:;"></a>
+            </div>
+            <div id="qr"></div>
+        </div>
+    </div>
+    <div class="scrollbar"></div>
+</div>
+    <div class="section">
+        <div class="article">
+    <div class='main'>
+        <h1 class="title">TP框架学习笔记(路由)</h1>
+        <div class="stuff">
+            <span>七月 24, 2018</span>
+            
+  <ul class="post-tags-list"><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/php/">php</a></li><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/tp/">tp</a></li></ul>
+
+
+        </div>
+        <div class="content markdown">
+            <h2 id="路由"><a href="#路由" class="headerlink" title="路由"></a>路由</h2><h3 id="URL的三种模式"><a href="#URL的三种模式" class="headerlink" title="URL的三种模式"></a>URL的三种模式</h3><ul>
+<li><p>动态URL</p>
+<p>  <code>eg: www.example.com/index.php?id=1</code></p>
+<p>  这种在URL中使用”?,=,&amp;”等传递参数的URL被称为动态路由</p>
+</li>
+<li><p>静态URL</p>
+<p>  <code>eg: www.example.com/index.html</code></p>
+<p>  这种常以”.html,.htm,.xml”结尾的网站与后台没有交互，不需要编译即可运行</p>
+</li>
+<li><p>伪静态URL</p>
+<p>  <code>eg: www.example.com/post/1</code></p>
+<p>  这种URL看起来像是静态页面，但是其实不是静态页面，只是运用了URL Rewrite技术来优化搜索引擎</p>
+</li>
+</ul>
+<h3 id="TP的路由"><a href="#TP的路由" class="headerlink" title="TP的路由"></a>TP的路由</h3><ul>
+<li>普通模式：<code>http://www.example.com/index.php?m=home&amp;c=index&amp;a=index</code></li>
+<li>pathinfo模式：<code>http://www.example.com/index.php/home/index/index</code></li>
+<li>rewrite模式：<code>http://www.example.com/home/index/index</code></li>
+<li>兼容模式：<code>http://www.example.com/index.php?s=home/index/index</code></li>
+</ul>
+<p>TP通过<code>URL_ROUTER_ON</code>来开启自定义路由规则，并且通过<code>URL_ROUTE_RULES</code>来定义路由的规则</p>
+<p>路由定义的一般规则：<code>&quot;路由表达式&quot; =&gt; &quot;路由地址和参数&quot;</code></p>
+<p>路由表达式：以何种规则匹配浏览器中的地址，如果匹配成功，系统在处理请求的同时把传入参数传给制定动作</p>
+<p>路由表达式支持：规则路由，正则路由，静态路由</p>
+<h4 id="规则路由"><a href="#规则路由" class="headerlink" title="规则路由"></a>规则路由</h4><p><code>eg: &#39;posts/:yead/:month/:day&#39; =&gt; &#39;Index/index&#39;</code></p>
+<p>通过<code>:</code>来进行参数匹配，如果匹配成功，则将该为孩子的参数传给制定的动作</p>
+<h4 id="正则路由"><a href="#正则路由" class="headerlink" title="正则路由"></a>正则路由</h4><p><code>eg: &#39;/^posts\/(\d{4})\/(\d{2})\/(\d{2})$/&#39; =&gt; &#39;Index/index?year=:1&amp;month=:2&amp;day=1&#39;</code></p>
+<p>通过正则匹配来匹配URL</p>
+<h4 id="静态路由"><a href="#静态路由" class="headerlink" title="静态路由"></a>静态路由</h4><p>注意：静态路由通过<code>URL_MAP_RULES</code>定义</p>
+<p><code>eg: &#39;site/welcome&#39; =&gt; &#39;Index/index?from=seo</code></p>
+
+            <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
+            <audio id="audio" loop="1" preload="auto" controls="controls" data-autoplay="true">
+                <source type="audio/mpeg" src="">
+            </audio>
+            
+                <ul id="audio-list" style="display:none">
+                    
+                        <li title='0' data-url='http://link.hhtjim.com/163/5146554.mp3'></li>
+                    
+                        <li title='1' data-url='http://link.hhtjim.com/qq/001faIUs4M2zna.mp3'></li>
+                    
+                </ul>
+            
+        </div>
+        
+    <div id='gitalk-container' class="comment link"
+        data-ae='false'
+        data-ci=''
+        data-cs=''
+        data-r=''
+        data-o=''
+        data-a=''
+        data-d='false'
+    >查看评论</div>
+
+
+    </div>
+    
+        <div class='side'>
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#路由"><span class="toc-number">1.</span> <span class="toc-text">路由</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#URL的三种模式"><span class="toc-number">1.1.</span> <span class="toc-text">URL的三种模式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#TP的路由"><span class="toc-number">1.2.</span> <span class="toc-text">TP的路由</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#规则路由"><span class="toc-number">1.2.1.</span> <span class="toc-text">规则路由</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#正则路由"><span class="toc-number">1.2.2.</span> <span class="toc-text">正则路由</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#静态路由"><span class="toc-number">1.2.3.</span> <span class="toc-text">静态路由</span></a></li></ol></li></ol></li></ol>
+        </div>
+    
+</div>
+
+
+    </div>
+</div>
+</body>
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<script src="//lib.baomitu.com/jquery/1.8.3/jquery.min.js"></script>
+<script src="/js/plugin.js"></script>
+<script src="/js/diaspora.js"></script>
+<link rel="stylesheet" href="/photoswipe/photoswipe.css">
+<link rel="stylesheet" href="/photoswipe/default-skin/default-skin.css">
+<script src="/photoswipe/photoswipe.min.js"></script>
+<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div> 
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+</html>
