@@ -1,0 +1,205 @@
+
+<!DOCTYPE html>
+<html lang="" class="loading">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>技术改变世界，文化改变人心 - 一个专注于web安全的web狗</title>
+
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="google" content="notranslate" />
+    <meta name="keywords" content="Fechin,"> 
+    
+    <meta name="author" content="flight"> 
+    <link rel="alternative" href="atom.xml" title="技术改变世界，文化改变人心" type="application/atom+xml"> 
+    <link rel="icon" href="/img/favicon.png"> 
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+    <link rel="stylesheet" href="/css/diaspora.css">
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({
+        google_ad_client: "ca-pub-8691406134231910",
+        enable_page_level_ads: true
+      });
+    </script>
+
+</head>
+
+<body class="loading">
+    <div id="loader"></div>
+    <div id="single">
+    <div id="top" style="display: block;">
+    <div class="bar" style="width: 0;"></div>
+    <a class="icon-home image-icon" href="javascript:;"></a>
+    <div title="播放/暂停" class="icon-play"></div>
+    <h3 class="subtitle">OneThink CMS的缓存漏洞的分析</h3>
+    <div class="social">
+        <!--<div class="like-icon">-->
+            <!--<a href="javascript:;" class="likeThis active"><span class="icon-like"></span><span class="count">76</span></a>-->
+        <!--</div>-->
+        <div>
+            <div class="share">
+                <a title="获取二维码" class="icon-scan" href="javascript:;"></a>
+            </div>
+            <div id="qr"></div>
+        </div>
+    </div>
+    <div class="scrollbar"></div>
+</div>
+    <div class="section">
+        <div class="article">
+    <div class='main'>
+        <h1 class="title">OneThink CMS的缓存漏洞的分析</h1>
+        <div class="stuff">
+            <span>七月 27, 2018</span>
+            
+  <ul class="post-tags-list"><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/tp/">tp</a></li><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/漏洞分析/">漏洞分析</a></li></ul>
+
+
+        </div>
+        <div class="content markdown">
+            <p>第一次分析漏洞，跟着其他师傅的分析过程自己走了一遍，有的地方不太懂也查清楚了，写一遍加深记忆吧</p>
+<h2 id="0x01-漏洞利用条件"><a href="#0x01-漏洞利用条件" class="headerlink" title="0x01 漏洞利用条件"></a>0x01 漏洞利用条件</h2><ol>
+<li>OneThink1.0 </li>
+<li>并且/Temp/Runtime目录可读可写</li>
+</ol>
+<h2 id="0x02-漏洞分析"><a href="#0x02-漏洞分析" class="headerlink" title="0x02 漏洞分析"></a>0x02 漏洞分析</h2><p><em>因为TP对缓存设计逻辑的漏洞，以及缓存文件名可猜测的原因，导致了这个漏洞</em></p>
+<p>先看一下TP的缓存文件的配置：</p>
+<p>TP中一些系统常量的定义都在ThinkPHP/ThinkPHP.php中定义，缓存路径也在这里：</p>
+<p><img src="http://120.77.152.169/pic_upload/upload/201807272125576791.png" alt=""></p>
+<p>可以看到其中的TEMP_PATH默认值为Runtime/Temp目录</p>
+<p>而缓存文件存储的位置在ThinkPHP/Conf/convention.php</p>
+<p><img src="http://120.77.152.169/pic_upload/upload/201807272131347157.png" alt=""></p>
+<p>我们开始从登陆开始一步步分析OneThink在登陆的时候缓存文件是如何存储的：</p>
+<p>在抓包以后，我们发现请求的地址为/home/user/login.html，那么跟踪这个请求，我们可以定位到Home模块的UserController控制器中的login方法：</p>
+<p><img src="http://120.77.152.169/pic_upload/upload/201807272151148027.png" alt=""></p>
+<p>其中在登陆成功以后调用了<code>$Member</code>中的login方法，传入的<code>$uid</code>是从数据库中查询出来的用户名对应的用户id</p>
+<p><img src="http://120.77.152.169/pic_upload/upload/201807272155424814.png" alt=""></p>
+<p>其中的D函数是TP中获取model的方法，这里相当于获得了一个MemberModel类的实例，我们进入MemberModel中查看一下其中的login函数</p>
+<p><img src="http://120.77.152.169/pic_upload/upload/201807272158284296.png" alt=""></p>
+<p>其中的<code>$user</code>是从<code>$uid</code>中拿到的，也就是用户名</p>
+<p>在登陆用户的时候调用了autoLogin函数，进入这个函数里面查看</p>
+<p><img src="http://120.77.152.169/pic_upload/upload/201807272200532749.png" alt=""></p>
+<p>里面调用了get_username函数，继续跟入</p>
+<p><img src="http://120.77.152.169/pic_upload/upload/201807272202008338.png" alt=""></p>
+<p>终于找到了对于用户名的缓存操作</p>
+<p>在第一次登陆的时候是没有缓存的，if条件应该直接进入else部分，又因为<code>$list</code>是从<code>$uid</code>所在行的第二行拿到的，所以应该是用户名，所以在下面调用S方法缓存数据的时候传入的<code>$list</code>我们是可控的</p>
+<p>再进入S函数，查看一下这个函数的具体设计</p>
+<p><img src="http://120.77.152.169/pic_upload/upload/201807272142186105.png" alt=""></p>
+<p>我们传入的<code>$list</code>就是S函数中的value参数，分析if条件的话可以知道程序直接进入第二个elseif，初始化<code>$cache</code>，关键在最后的set函数，set函数中的<code>$value</code>仍然是我们可控的，进入set函数中，set函数在ThinkPHP/Library/Think/Cache/Driver/File.class.php</p>
+<p><img src="http://120.77.152.169/pic_upload/upload/201807272219277617.png" alt=""></p>
+<p>发现<code>$filename</code>被<code>file_put_contents</code>直接调用，如果不开启数据压缩的话，<code>$data</code>则是我们控制的<code>$value</code>序列化以后存入的值</p>
+<p>现在我们可以控制文件中的一部分内容，知道了文件存储的目录，如果我们知道文件名就好了，那么我们进入filename函数里面看一下缓存文件的文件名是怎么定义的</p>
+<p><img src="http://120.77.152.169/pic_upload/upload/201807272227185813.png" alt=""></p>
+<p>因为一般没有开启<code>DATA_CACHE_SUBDIR</code>，所以判断直接跳到else部分，而options[‘prefix’]是空的，所以最后的文件名为<code>md5($name).php</code></p>
+<p>现在我们构造payload：</p>
+<p>用户名注册为<code>%0aphpinfo();#</code>这样在存储缓存文件的时候就可以写入webshell，#注释了序列化的剩余部分，前面的%0a的作用则是为了不让<code>$data</code>中<code>&lt;?php\n//&quot;.sprintf(&#39;%012d&#39;,$expire).$check.$data.&quot;\n?&gt;</code>的’//‘注释攻击代码</p>
+<h2 id="0x03-漏洞利用"><a href="#0x03-漏洞利用" class="headerlink" title="0x03 漏洞利用"></a>0x03 漏洞利用</h2><p>在OneThink的注册页面中的注册用户名为:<code>%0aphpinfo();#</code>，并且用burp抓包将%0a解码</p>
+<p><img src="http://120.77.152.169/pic_upload/upload/201807272242455568.png" alt=""></p>
+<p>之后用这个用户名登陆，同样抓包将%0a解码，之后访问Temp/Runtime/用户名md5.php，即可发现phpinfo得以执行</p>
+<p><img src="http://120.77.152.169/pic_upload/upload/201807272247202764.png" alt=""></p>
+<p>查看缓存文件的内容，可以发现payload的原理：</p>
+<p><img src="http://120.77.152.169/pic_upload/upload/201807272248262076.png" alt=""></p>
+<h2 id="0x04-总结"><a href="#0x04-总结" class="headerlink" title="0x04 总结"></a>0x04 总结</h2><p>这是第一次这么系统的分析一个漏洞，可以说学到了很多，最近也在学TP框架，正好也是一个巩固和提高，虽然是跟着别人的路走的，但是仍然很艰难，可能是第一次分析漏洞吧，这是第一次，但不是最后一次，希望下次能更游刃有余吧</p>
+
+            <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
+            <audio id="audio" loop="1" preload="auto" controls="controls" data-autoplay="true">
+                <source type="audio/mpeg" src="">
+            </audio>
+            
+                <ul id="audio-list" style="display:none">
+                    
+                        <li title='0' data-url='http://link.hhtjim.com/163/5146554.mp3'></li>
+                    
+                        <li title='1' data-url='http://link.hhtjim.com/qq/001faIUs4M2zna.mp3'></li>
+                    
+                </ul>
+            
+        </div>
+        
+    <div id='gitalk-container' class="comment link"
+        data-ae='false'
+        data-ci='ab4779294ba3aa21f750'
+        data-cs='1a3ef9499579896daee2987e677540f962c504a5'
+        data-r='gitalkplugin'
+        data-o='ox1234'
+        data-a='ox1234'
+        data-d='false'
+    >查看评论</div>
+
+
+    </div>
+    
+        <div class='side'>
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#0x01-漏洞利用条件"><span class="toc-number">1.</span> <span class="toc-text">0x01 漏洞利用条件</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0x02-漏洞分析"><span class="toc-number">2.</span> <span class="toc-text">0x02 漏洞分析</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0x03-漏洞利用"><span class="toc-number">3.</span> <span class="toc-text">0x03 漏洞利用</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#0x04-总结"><span class="toc-number">4.</span> <span class="toc-text">0x04 总结</span></a></li></ol>
+        </div>
+    
+</div>
+
+
+    </div>
+</div>
+</body>
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<script src="//lib.baomitu.com/jquery/1.8.3/jquery.min.js"></script>
+<script src="/js/plugin.js"></script>
+<script src="/js/diaspora.js"></script>
+<link rel="stylesheet" href="/photoswipe/photoswipe.css">
+<link rel="stylesheet" href="/photoswipe/default-skin/default-skin.css">
+<script src="/photoswipe/photoswipe.min.js"></script>
+<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div> 
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+</html>
