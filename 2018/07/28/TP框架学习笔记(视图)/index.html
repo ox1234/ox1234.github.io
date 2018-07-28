@@ -29,26 +29,87 @@
 
 <body class="loading">
     <div id="loader"></div>
-    <div id="single" class="page">
-    <div id="top">
-        <a class="icon-left image-icon" href="javascript:history.back()"></a>
-    </div>
-    <div class="section">
-        <div class="article">
-            <div class="main">
-                <div class="content">
-                    <p><a href="https://doubler.cn" target="_blank" rel="noopener">double-r’s blog</a></p>
-<p><a href="http://pupiles.com" target="_blank" rel="noopener">pupil’s blog</a></p>
-<p><a href="http://codeqi.top" target="_blank" rel="noopener">qiqi’s blog</a></p>
-<p><a href="http://quincyblog.top" target="_blank" rel="noopener">quincy’s blog</a></p>
-<p><a href="https://blog.void0red.top" target="_blank" rel="noopener">void0red’s blog</a></p>
-
-                </div>
+    <div id="single">
+    <div id="top" style="display: block;">
+    <div class="bar" style="width: 0;"></div>
+    <a class="icon-home image-icon" href="javascript:;"></a>
+    <div title="播放/暂停" class="icon-play"></div>
+    <h3 class="subtitle">TP框架学习笔记(视图)</h3>
+    <div class="social">
+        <!--<div class="like-icon">-->
+            <!--<a href="javascript:;" class="likeThis active"><span class="icon-like"></span><span class="count">76</span></a>-->
+        <!--</div>-->
+        <div>
+            <div class="share">
+                <a title="获取二维码" class="icon-scan" href="javascript:;"></a>
             </div>
+            <div id="qr"></div>
         </div>
     </div>
+    <div class="scrollbar"></div>
+</div>
+    <div class="section">
+        <div class="article">
+    <div class='main'>
+        <h1 class="title">TP框架学习笔记(视图)</h1>
+        <div class="stuff">
+            <span>七月 28, 2018</span>
+            
+  <ul class="post-tags-list"><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/php/">php</a></li><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/tp/">tp</a></li></ul>
+
+
+        </div>
+        <div class="content markdown">
+            <h2 id="模版定义"><a href="#模版定义" class="headerlink" title="模版定义"></a>模版定义</h2><p>某个模块的模版文件是独立的，默认的模版文件定义规则是：</p>
+<p>`视图目录/[模版主题]/控制器名/操作名+视图后缀</p>
+<p>默认的视图目录是模块的View目录，框架默认的视图后缀为.html，</p>
+<p>eg: Home模块下的User控制器的add方法对应的模版文件路径为：</p>
+<p>`Application/Home/View/User/add.html</p>
+<p>如果项目的视图不是View的话，可以通过<code>&#39;DEFAULT_V_LAYER&#39; =&gt; &#39;Template&#39;</code>来更改</p>
+<p>如果需要更改后缀，可以更改：</p>
+<p><code>&#39;TEMPL_TEMPLATE_SUFFIX&#39; =&gt; &#39;tpl&#39;</code></p>
+<h2 id="模版主题"><a href="#模版主题" class="headerlink" title="模版主题"></a>模版主题</h2><p>如果某个模块要支持多个主题的话，可以使用模版主题功能</p>
+<p>配置：<code>&#39;DEFAULT_THEME&#39; =&gt; &#39;main&#39;</code></p>
+<h2 id="模版赋值"><a href="#模版赋值" class="headerlink" title="模版赋值"></a>模版赋值</h2><p>如果要在模版中输出变量，需要在控制器中把变量传递给模版，系统提供了assign方法对变量赋值</p>
+<h2 id="模版渲染"><a href="#模版渲染" class="headerlink" title="模版渲染"></a>模版渲染</h2><p>可以使用display函数</p>
+
+            <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
+            <audio id="audio" loop="1" preload="auto" controls="controls" data-autoplay="true">
+                <source type="audio/mpeg" src="">
+            </audio>
+            
+                <ul id="audio-list" style="display:none">
+                    
+                        <li title='0' data-url='http://link.hhtjim.com/163/5146554.mp3'></li>
+                    
+                        <li title='1' data-url='http://link.hhtjim.com/qq/001faIUs4M2zna.mp3'></li>
+                    
+                </ul>
+            
+        </div>
+        
+    <div id='gitalk-container' class="comment link"
+        data-ae='false'
+        data-ci='ab4779294ba3aa21f750'
+        data-cs='1a3ef9499579896daee2987e677540f962c504a5'
+        data-r='gitalkplugin'
+        data-o='ox1234'
+        data-a='ox1234'
+        data-d='false'
+    >查看评论</div>
+
+
+    </div>
+    
+        <div class='side'>
+            <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#模版定义"><span class="toc-number">1.</span> <span class="toc-text">模版定义</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#模版主题"><span class="toc-number">2.</span> <span class="toc-text">模版主题</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#模版赋值"><span class="toc-number">3.</span> <span class="toc-text">模版赋值</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#模版渲染"><span class="toc-number">4.</span> <span class="toc-text">模版渲染</span></a></li></ol>
+        </div>
+    
 </div>
 
+
+    </div>
+</div>
 </body>
 <script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
 <script src="//lib.baomitu.com/jquery/1.8.3/jquery.min.js"></script>

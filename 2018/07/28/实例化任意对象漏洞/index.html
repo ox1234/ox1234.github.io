@@ -1,0 +1,196 @@
+
+<!DOCTYPE html>
+<html lang="" class="loading">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>技术改变世界，文化改变人心 - 一个专注于web安全的web狗</title>
+
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="google" content="notranslate" />
+    <meta name="keywords" content="Fechin,"> 
+    
+    <meta name="author" content="flight"> 
+    <link rel="alternative" href="atom.xml" title="技术改变世界，文化改变人心" type="application/atom+xml"> 
+    <link rel="icon" href="/img/favicon.png"> 
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+    <link rel="stylesheet" href="/css/diaspora.css">
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({
+        google_ad_client: "ca-pub-8691406134231910",
+        enable_page_level_ads: true
+      });
+    </script>
+
+</head>
+
+<body class="loading">
+    <div id="loader"></div>
+    <div id="single">
+    <div id="top" style="display: block;">
+    <div class="bar" style="width: 0;"></div>
+    <a class="icon-home image-icon" href="javascript:;"></a>
+    <div title="播放/暂停" class="icon-play"></div>
+    <h3 class="subtitle">实例化漏洞和XXE</h3>
+    <div class="social">
+        <!--<div class="like-icon">-->
+            <!--<a href="javascript:;" class="likeThis active"><span class="icon-like"></span><span class="count">76</span></a>-->
+        <!--</div>-->
+        <div>
+            <div class="share">
+                <a title="获取二维码" class="icon-scan" href="javascript:;"></a>
+            </div>
+            <div id="qr"></div>
+        </div>
+    </div>
+    <div class="scrollbar"></div>
+</div>
+    <div class="section">
+        <div class="article">
+    <div class='main'>
+        <h1 class="title">实例化漏洞和XXE</h1>
+        <div class="stuff">
+            <span>七月 28, 2018</span>
+            
+  <ul class="post-tags-list"><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/安全技术/">安全技术</a></li><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/漏洞分析/">漏洞分析</a></li></ul>
+
+
+        </div>
+        <div class="content markdown">
+            <h1 id="一道实例化漏洞和XXE结合的题"><a href="#一道实例化漏洞和XXE结合的题" class="headerlink" title="一道实例化漏洞和XXE结合的题"></a>一道实例化漏洞和XXE结合的题</h1><h2 id="题目源码"><a href="#题目源码" class="headerlink" title="题目源码"></a>题目源码</h2><figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//index.php</span></span><br><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">show_source(<span class="keyword">__FILE__</span>);</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">NotFound</span></span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="title">__construct</span><span class="params">()</span></span></span><br><span class="line"><span class="function">    </span>&#123;</span><br><span class="line">        <span class="keyword">die</span>(<span class="string">'404'</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">spl_autoload_register(</span><br><span class="line">    <span class="function"><span class="keyword">function</span> <span class="params">($class)</span></span>&#123;</span><br><span class="line">        <span class="keyword">new</span> NotFound();</span><br><span class="line">    &#125;</span><br><span class="line">);</span><br><span class="line">$classname = <span class="keyword">isset</span>($_GET[<span class="string">'name'</span>]) ? $_GET[<span class="string">'name'</span>] : <span class="keyword">null</span>;</span><br><span class="line">$param = <span class="keyword">isset</span>($_GET[<span class="string">'param'</span>]) ? $_GET[<span class="string">'param'</span>] : <span class="keyword">null</span>;</span><br><span class="line">$param2 = <span class="keyword">isset</span>($_GET[<span class="string">'param2'</span>]) ? $_GET[<span class="string">'param2'</span>] : <span class="keyword">null</span>;</span><br><span class="line"><span class="keyword">if</span>(class_exists($classname))&#123;</span><br><span class="line">    $newclass = <span class="keyword">new</span> $classname($param,$param2);</span><br><span class="line">    var_dump($newclass);</span><br><span class="line">    <span class="keyword">foreach</span> ($newclass <span class="keyword">as</span> $key=&gt;$value)</span><br><span class="line">        <span class="keyword">echo</span> $key.<span class="string">'=&gt;'</span>.$value.<span class="string">'&lt;br&gt;'</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight php"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//flag13Here.php</span></span><br><span class="line"><span class="meta">&lt;?php</span></span><br><span class="line">$flag = <span class="string">"HRCTF&#123;X33_W1tH_S1mpl3Xml3l3m3nt&#125;"</span>;</span><br><span class="line"><span class="meta">?&gt;</span></span><br></pre></td></tr></table></figure>
+<h2 id="解法分析"><a href="#解法分析" class="headerlink" title="解法分析"></a>解法分析</h2><p>先看可控的点：</p>
+<p>有三个get参数的点可以控制，分别是<code>$classname</code>,<code>$param</code>,<code>$param2</code></p>
+<p>再往后看，<code>$classname</code>可以让我们实例化一个类，这个类是我们可控的，而且可以控制该类构造方法的前两个参数</p>
+<p>这个地方很容易想到PHP的内置类：SimpleXMLElement，可以进行xxe攻击，但是我们现在不知道flag文件的名字，这个时候可以用PHP中的另外一个内置类：GlobIterator，可以列出来所有匹配的文件名（这个类有点像glob://协议）：</p>
+<p><img src="http://120.77.152.169/pic_upload/upload/201807281404385656.png" alt=""></p>
+<p><img src="http://120.77.152.169/pic_upload/upload/201807281404532062.png" alt=""></p>
+<p>根据文档，很容易理解GlobIterator类的构造方式，而第二个参数控制的是输出的键值，可以选择0，所以构造payload：</p>
+<p><code>?name=GlobIterator&amp;param1=./*.php&amp;param2=0</code></p>
+<p>发现成功读出当前目录的文件</p>
+<p><img src="http://120.77.152.169/pic_upload/upload/201807281411186509.png" alt=""></p>
+<p>现在已经知道了flag的文件名，那么我们可以构造SimpleXMLElement类来进行XXE来读取flag文件的内容</p>
+<p>先看一下SimpleXMLElement的构造方法</p>
+<p><img src="http://120.77.152.169/pic_upload/upload/201807281414446430.png" alt=""></p>
+<p>第一个参数可以是XML的文件路径，可以是XML文件内容，也可以是URL（需要第三个参数为true）</p>
+<p>第二个参数为系统预定义的常量，具体的意义如下：</p>
+<p><img src="http://120.77.152.169/pic_upload/upload/201807281430128151.png" alt=""></p>
+<p>为了避免一些特殊字符的错误，我们将结果进行base64编码：</p>
+<p>构造payload为：<code>name=SimpleXMLElement&amp;param=/Library/WebServer/Documents/PhpProjects/CTF_php/flag13Here.php&amp;param2=2</code></p>
+<p>即可读取到结果：</p>
+<p><img src="http://120.77.152.169/pic_upload/upload/201807281431398705.png" alt=""></p>
+
+            <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
+            <audio id="audio" loop="1" preload="auto" controls="controls" data-autoplay="true">
+                <source type="audio/mpeg" src="">
+            </audio>
+            
+                <ul id="audio-list" style="display:none">
+                    
+                        <li title='0' data-url='http://link.hhtjim.com/163/5146554.mp3'></li>
+                    
+                        <li title='1' data-url='http://link.hhtjim.com/qq/001faIUs4M2zna.mp3'></li>
+                    
+                </ul>
+            
+        </div>
+        
+    <div id='gitalk-container' class="comment link"
+        data-ae='false'
+        data-ci='ab4779294ba3aa21f750'
+        data-cs='1a3ef9499579896daee2987e677540f962c504a5'
+        data-r='gitalkplugin'
+        data-o='ox1234'
+        data-a='ox1234'
+        data-d='false'
+    >查看评论</div>
+
+
+    </div>
+    
+        <div class='side'>
+            <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#一道实例化漏洞和XXE结合的题"><span class="toc-number">1.</span> <span class="toc-text">一道实例化漏洞和XXE结合的题</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#题目源码"><span class="toc-number">1.1.</span> <span class="toc-text">题目源码</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#解法分析"><span class="toc-number">1.2.</span> <span class="toc-text">解法分析</span></a></li></ol></li></ol>
+        </div>
+    
+</div>
+
+
+    </div>
+</div>
+</body>
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<script src="//lib.baomitu.com/jquery/1.8.3/jquery.min.js"></script>
+<script src="/js/plugin.js"></script>
+<script src="/js/diaspora.js"></script>
+<link rel="stylesheet" href="/photoswipe/photoswipe.css">
+<link rel="stylesheet" href="/photoswipe/default-skin/default-skin.css">
+<script src="/photoswipe/photoswipe.min.js"></script>
+<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div> 
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-122935851-1', 'auto');
+  ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+</html>
