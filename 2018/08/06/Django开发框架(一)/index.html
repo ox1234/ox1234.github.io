@@ -1,0 +1,221 @@
+
+<!DOCTYPE html>
+<html lang="" class="loading">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>技术改变世界，文化改变人心 - 一个专注于web安全的web狗</title>
+
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="google" content="notranslate" />
+    <meta name="keywords" content="Fechin,"> 
+    
+    <meta name="author" content="flight"> 
+    <link rel="alternative" href="atom.xml" title="技术改变世界，文化改变人心" type="application/atom+xml"> 
+    <link rel="icon" href="/img/favicon.png"> 
+    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.css">
+    <link rel="stylesheet" href="/css/diaspora.css">
+    <script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+    <script>
+      (adsbygoogle = window.adsbygoogle || []).push({
+        google_ad_client: "ca-pub-8691406134231910",
+        enable_page_level_ads: true
+      });
+    </script>
+
+</head>
+
+<body class="loading">
+    <div id="loader"></div>
+    <div id="single">
+    <div id="top" style="display: block;">
+    <div class="bar" style="width: 0;"></div>
+    <a class="icon-home image-icon" href="javascript:;"></a>
+    <div title="播放/暂停" class="icon-play"></div>
+    <h3 class="subtitle">Django开发框架(一)</h3>
+    <div class="social">
+        <!--<div class="like-icon">-->
+            <!--<a href="javascript:;" class="likeThis active"><span class="icon-like"></span><span class="count">76</span></a>-->
+        <!--</div>-->
+        <div>
+            <div class="share">
+                <a title="获取二维码" class="icon-scan" href="javascript:;"></a>
+            </div>
+            <div id="qr"></div>
+        </div>
+    </div>
+    <div class="scrollbar"></div>
+</div>
+    <div class="section">
+        <div class="article">
+    <div class='main'>
+        <h1 class="title">Django开发框架(一)</h1>
+        <div class="stuff">
+            <span>八月 06, 2018</span>
+            
+  <ul class="post-tags-list"><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/django/">django</a></li><li class="post-tags-list-item"><a class="post-tags-list-link" href="/tags/python/">python</a></li></ul>
+
+
+        </div>
+        <div class="content markdown">
+            <h1 id="Django开发框架-一"><a href="#Django开发框架-一" class="headerlink" title="Django开发框架(一)"></a>Django开发框架(一)</h1><h2 id="Django目录结构"><a href="#Django目录结构" class="headerlink" title="Django目录结构"></a>Django目录结构</h2><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">djangosite/</span><br><span class="line">    manage.py</span><br><span class="line">    djangosite/</span><br><span class="line">        __init__.py</span><br><span class="line">        settings.py</span><br><span class="line">        urls.py</span><br><span class="line">        wsgi.py</span><br></pre></td></tr></table></figure>
+<p>manage.py：Django用于管理本项目的命令行工具<br>__init__：告诉python该目录是一个python包<br>settings.py：Django的配置文件<br>urls.py：维护项目的URL路由映射<br>wsgi.py：定义WSGI接口信息</p>
+<h2 id="建立应用目录结构"><a href="#建立应用目录结构" class="headerlink" title="建立应用目录结构"></a>建立应用目录结构</h2><p>建立应用的命令：<code>python manage.py startapp 应用名称</code></p>
+<p>目录结构：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">app/</span><br><span class="line">    __init__.py</span><br><span class="line">    admin.py</span><br><span class="line">    apps.py</span><br><span class="line">    migrations/</span><br><span class="line">        __init__.py</span><br><span class="line">    models.py</span><br><span class="line">    tests.py</span><br><span class="line">    views.py</span><br></pre></td></tr></table></figure>
+<h2 id="Django的路由规则"><a href="#Django的路由规则" class="headerlink" title="Django的路由规则"></a>Django的路由规则</h2><p>Django的路由规则由<code>django.conf.urls</code>中的url函数实现</p>
+<p>在app中可以定义路由规则，在Django的urls.py中将app中定义的路由规则包含进来</p>
+<p>urls.py–app:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.conf.urls <span class="keyword">import</span> url</span><br><span class="line"><span class="keyword">from</span> . <span class="keyword">import</span> views</span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">	url(<span class="string">r''</span>,views.welcome),</span><br><span class="line">	</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<p>urls.py–MyDjango:</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django.conf.urls <span class="keyword">import</span> url</span><br><span class="line"><span class="keyword">from</span> django.contrib <span class="keyword">import</span> admin</span><br><span class="line"><span class="keyword">from</span> django.conf.urls <span class="keyword">import</span> include</span><br><span class="line"></span><br><span class="line">urlpatterns = [</span><br><span class="line">	url(<span class="string">r'^app/'</span>, include(<span class="string">'app.urls'</span>)),</span><br><span class="line">    url(<span class="string">r'^admin/'</span>, admin.site.urls),</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<p>在包含路由的时候需要导入<code>from django.urls import include</code></p>
+<h2 id="模型类"><a href="#模型类" class="headerlink" title="模型类"></a>模型类</h2><ul>
+<li>配置项目INSTALLED_APPS</li>
+</ul>
+<p>要在MyDjango项目的settings.py中告诉Django需要安装应用app中的模型，则方法是打开MyDjango/settings.py文件，找到其中的INSTALLED_APPS数组，在其中添加应用app的Config类</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">INSTALLED_APPS = [</span><br><span class="line">    <span class="string">'app.apps.Appconfig'</span>,</span><br><span class="line">    <span class="string">'django.contrib.admin'</span>,</span><br><span class="line">    <span class="string">'django.contrib.auth'</span>,</span><br><span class="line">    <span class="string">'django.contrib.contenttypes'</span>,</span><br><span class="line">    <span class="string">'django.contrib.sessions'</span>,</span><br><span class="line">    <span class="string">'django.contrib.messages'</span>,</span><br><span class="line">    <span class="string">'django.contrib.staticfiles'</span>,</span><br><span class="line">]</span><br></pre></td></tr></table></figure>
+<ul>
+<li>模型定义</li>
+</ul>
+<p>所有的Django模型类必须继承自<code>django.db.models</code></p>
+<ul>
+<li>生成数据移植文件</li>
+</ul>
+<p>Django的术语“生成数据移植文件”是指将models.py中定义的数据表转换为数据库生成脚本的过程，该过程由manage.py完成</p>
+<p>命令：<code>python manage.py makemigrations app</code></p>
+<ul>
+<li>移植到数据库</li>
+</ul>
+<p>在模型的需改过程中可以随时调用makemigrations生成中间移植文件，而当需要使移植文件生效，修改真实数据库schema时，需要manage.py的migrate命令将修改同步到数据库中</p>
+<h2 id="表单视图"><a href="#表单视图" class="headerlink" title="表单视图"></a>表单视图</h2><ul>
+<li>定义表单类</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> django <span class="keyword">import</span> ModelForm</span><br><span class="line"><span class="keyword">from</span> app.models <span class="keyword">import</span> Moment</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MomentForm</span><span class="params">(ModelForm)</span>:</span></span><br><span class="line">	<span class="class"><span class="keyword">class</span> <span class="title">Meta</span>:</span></span><br><span class="line">		model = Moment</span><br><span class="line">		fields = <span class="string">'__all__'</span></span><br></pre></td></tr></table></figure>
+<ol>
+<li>引入<code>django.forms.ModelForm</code>，该类时所用Django表单类的基类</li>
+<li>引入本应用models.py中定义的Moment类，以便在后面的表单类中关联Moment类</li>
+<li>定义表单类MomentForm，在其中定义子类Meta，在Meta中声明与本表单关联的模型类及其字段</li>
+<li>Fields字段可以设置为__all__，也可以用列表形式声明所要导入的属性，比如：Fields=(‘content’,’user_name’,’kind’)</li>
+</ol>
+<ul>
+<li>修改模型类</li>
+</ul>
+<p>为了使用户能够以单选的方式设置消息类型，则需要在models.py文件中定义单选枚举值，并与模型类Moment相关联</p>
+<ul>
+<li>开发模版文件</li>
+</ul>
+
+            <!--[if lt IE 9]><script>document.createElement('audio');</script><![endif]-->
+            <audio id="audio" loop="1" preload="auto" controls="controls" data-autoplay="true">
+                <source type="audio/mpeg" src="">
+            </audio>
+            
+                <ul id="audio-list" style="display:none">
+                    
+                        <li title='0' data-url='http://link.hhtjim.com/163/5146554.mp3'></li>
+                    
+                        <li title='1' data-url='http://link.hhtjim.com/qq/001faIUs4M2zna.mp3'></li>
+                    
+                </ul>
+            
+        </div>
+        
+    <div id='gitalk-container' class="comment link"
+        data-ae='false'
+        data-ci='ab4779294ba3aa21f750'
+        data-cs='1a3ef9499579896daee2987e677540f962c504a5'
+        data-r='gitalkplugin'
+        data-o='ox1234'
+        data-a='ox1234'
+        data-d='false'
+    >查看评论</div>
+
+
+    </div>
+    
+        <div class='side'>
+            <ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Django开发框架-一"><span class="toc-number">1.</span> <span class="toc-text">Django开发框架(一)</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#Django目录结构"><span class="toc-number">1.1.</span> <span class="toc-text">Django目录结构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#建立应用目录结构"><span class="toc-number">1.2.</span> <span class="toc-text">建立应用目录结构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Django的路由规则"><span class="toc-number">1.3.</span> <span class="toc-text">Django的路由规则</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#模型类"><span class="toc-number">1.4.</span> <span class="toc-text">模型类</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#表单视图"><span class="toc-number">1.5.</span> <span class="toc-text">表单视图</span></a></li></ol></li></ol>
+        </div>
+    
+</div>
+
+
+    </div>
+</div>
+</body>
+<script src="//cdn.jsdelivr.net/npm/gitalk@1/dist/gitalk.min.js"></script>
+<script src="//lib.baomitu.com/jquery/1.8.3/jquery.min.js"></script>
+<script src="/js/plugin.js"></script>
+<script src="/js/diaspora.js"></script>
+<link rel="stylesheet" href="/photoswipe/photoswipe.css">
+<link rel="stylesheet" href="/photoswipe/default-skin/default-skin.css">
+<script src="/photoswipe/photoswipe.min.js"></script>
+<script src="/photoswipe/photoswipe-ui-default.min.js"></script>
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div> 
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Google Analytics -->
+<script type="text/javascript">
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+  ga('create', 'UA-122935851-1', 'auto');
+  ga('send', 'pageview');
+</script>
+<!-- End Google Analytics -->
+
+
+</html>
