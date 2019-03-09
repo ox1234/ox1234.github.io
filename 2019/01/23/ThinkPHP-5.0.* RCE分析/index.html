@@ -1,0 +1,52 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="author" content="flight"><link rel="alternative" href="/atom.xml" title="技术改变世界，文化改变人心" type="application/atom+xml"><link rel="icon" href="/favicon.png"><title>ThinkPHP-5.0.* RCE分析 - 技术改变世界，文化改变人心</title><link rel="stylesheet" href="/css/main.css"><link rel="stylesheet" href="/js/fancybox/jquery.fancybox.min.css"><!--[if lt IE 9]><script>(function(a,b){a="abbr article aside audio bdi canvas data datalist details dialog figcaption figure footer header hgroup main mark meter nav output progress section summary template time video".split(" ");for(b=a.length-1;b>=0;b--)document.createElement(a[b])})()</script><![endif]--><script src="/js/jquery-3.1.1.min.js"></script><script src="/js/fancybox/jquery.fancybox.min.js"></script></head><body style="opacity:0"><header class="head"><h1 class="head-title u-fl"><a href="/">技术改变世界，文化改变人心</a></h1><nav class="head-nav u-fr"><ul class="head-nav__list"><li class="head-nav__item"><a class="head-nav__link" href="/archives">カタログ/（目录）</a></li></ul></nav></header><main class="main"><article class="post"><header class="post__head"> <time class="post__time" datetime="2019-01-23T02:18:40.118Z">January 23, 2019</time><h1 class="post__title"><a href="/2019/01/23/ThinkPHP-5.0.* RCE分析/">ThinkPHP-5.0.* RCE分析</a></h1><div class="post__main echo"><p>前几周一直在复习考试，也没有看最近出的一些洞，寒假闲下来以后，要把最近出的洞都补了</p>
+<h1 id="漏洞核心"><a href="#漏洞核心" class="headerlink" title="漏洞核心"></a>漏洞核心</h1><p>TP的这个RCE漏洞，主要的触发点在Request类中的method方法，这个存在一个当前类的任意方法调用，之后通过这个任意方法调用去覆盖掉filter的默认方法，从而实现RCE</p>
+<p><img src="http://120.77.152.169/upload/6d49d18a9beccd5ee8d128a9adfcd385.png" alt="enter description here"></p>
+<p>可以看到在526行，调用了<code>$this-&gt;{$this-&gt;method}($_POST)</code>，在这里，因为<code>$this-&gt;method</code>和<code>$_POST</code>我们都可控，可以调用当前类的任意方法，</p>
+<h1 id="漏洞分析"><a href="#漏洞分析" class="headerlink" title="漏洞分析"></a>漏洞分析</h1><h2 id="程序流程"><a href="#程序流程" class="headerlink" title="程序流程"></a>程序流程</h2><ol>
+<li>在App.php中，在116行的<code>$dispatch = self::routeCheck($request,$config);</code>进入URL路由检测</li>
+<li>通过URL检测，TP获取到执行的控制器为captcha</li>
+<li>在以下的调用栈中获取到了请求方法的type为method</li>
+</ol>
+<p><img src="http://120.77.152.169/upload/19d43eaf1a2b6cdf0844e6456040e93d.png" alt="enter description here"></p>
+<p><img src="http://120.77.152.169/upload/abc8c72e1effa26395c5be0236f8d156.png" alt="enter description here"></p>
+<ol start="4">
+<li>之后回到Route.php调用了$method = strtolower($request-&gt;method();这里就是触发点</li>
+<li>进入$request-&gt;method()</li>
+</ol>
+<p><img src="http://120.77.152.169/upload/74b23c8d9a38b382bc699721f777a11f.png" alt="enter description here"></p>
+<p>这里如果传入的POST数组设置了配置中的<code>var_method</code>的话，可以进入条件判断，我们看一下<code>var_method</code>是什么值</p>
+<p><img src="http://120.77.152.169/upload/f252fb01ecb0ddb51e99395bc2629721.png" alt="enter description here"></p>
+<p>所以，如果我们传入的POST数组中有<code>_method</code>键值对的话就可以直接进入逻辑</p>
+<ol start="6">
+<li>进入逻辑后，很容易看出来，$this-&gt;method的值是我们的_method的值，我们可以利用这一点来执行当前类的任意方法</li>
+<li>在当前类的<code>__construct()</code>方法中，传入的是一个数组，我们可以通过_method再一次调用这个类的<code>__construct</code>函数<br>如果这个类没有可以用来进行一些恶意操作的函数的话，这个当前类的任意方法调用并没有什么用，但是巧的是，在<code>__construct</code>函数中有着变量覆盖，这样的话，我们就可以覆盖整个类中的所有成员变量，我们看看<code>__construct</code>函数</li>
+</ol>
+<p><img src="http://120.77.152.169/upload/96dc656473e676bfa6bd2ef7b12af96e.png" alt="enter description here"></p>
+<p>传入的参数是一个数组，正好我们之前的方法调用的参数正好是POST数组，而且在139行有一个很明显的变量赋值的操作，而且这个变量的键和值我们都可控，意味着我们可以进行当前类的变量覆盖，当然，显而易见的filter变量应该是最好的选择，因为filter会对所有传入的参数进行一次函数调用</p>
+<p><img src="http://120.77.152.169/upload/66126fbe633f6bf702cf5679369c0c75.png" alt="enter description here"></p>
+<p>最后，我们将filter的值覆盖为系统函数system</p>
+<p><img src="http://120.77.152.169/upload/95264b4e242e240f44f6635348995126.png" alt="enter description here"></p>
+<p>这里我们同时赋值$this-&gt;method的值为get，因为captcha路由规则需要是get方法才能不出错</p>
+<ol start="8">
+<li>在路由结束以后，调用了$data = self::exec($dispatch, $config);</li>
+<li>因为在之前的路由中，判断路由的类型是method，所以进入了method的逻辑</li>
+</ol>
+<p><img src="http://120.77.152.169/upload/4261d4476ba1361ad08705cbb4bac63f.png" alt="enter description here"></p>
+<ol start="10">
+<li>这里又回到了Request类的方法调用，还记得我们之前对Reuqest类的变量覆盖吗，在这一步获取了filter的值，但是在之前，我们把filter覆盖为了system</li>
+</ol>
+<p><img src="http://120.77.152.169/upload/2f4d60a13a84909549813e1e7375ca7b.png" alt="enter description here"></p>
+<ol start="11">
+<li>在下面调用<code>array_walk_recursive</code>方法将$data的值都应用filterValue函数</li>
+</ol>
+<p><img src="http://120.77.152.169/upload/70c544ad0a1eca4bd1127da9472adf1d.png" alt="enter description here"></p>
+<p><img src="http://120.77.152.169/upload/daf9aa7c4db442b389ad001289835b8f.png" alt="enter description here"></p>
+<ol start="12">
+<li>最后，filterValue会对$data内的每个值都调用filter函数，这个时候，filter为system，data中为whoami</li>
+</ol>
+<p><img src="http://120.77.152.169/upload/7e647ca5a1f75eca362e2d216e1a9f09.png" alt="enter description here"></p>
+<p>最后成功实现RCE</p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>TP的此次RCE是因为对传入的<code>_method</code>没有进行过滤，所以TP在之后的修复中，也是对其中的<code>_method</code>设置了白名单</p>
+<p><img src="http://120.77.152.169/upload/484e41f1742c9a4cae92516b9c822c33.png" alt="enter description here"></p>
+<p>现在的web漏洞已经不再是以前的一个SQL注入，命令执行打天下的时代了，现在web的漏洞很多都需要很长的调用链才可以将整个攻击连贯起来</p>
+</div></header><footer class="post__foot u-cf"><ul class="post__tag u-fl"><li class="post__tag__item"><a class="post__tag__link" href="/tags/漏洞分析-TP/">漏洞分析,TP</a></li></ul></footer></article><div class="comments" id="lv-container" data-id="city" data-uid="your uid"><script>(function(d, s) {var j, e = d.getElementsByTagName(s)[0];if (typeof LivereTower === 'function') { return; } j = d.createElement(s);j.src = 'https://cdn-city.livere.com/js/embed.dist.js';j.async = true;e.parentNode.insertBefore(j, e);})(document, 'script');</script></div></main><footer class="foot"><div class="foot-copy">&copy; 2016-2019 flight</div></footer><script src="/js/scroller.js"></script><script src="/js/main.js"></script></body></html>
